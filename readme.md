@@ -3,5 +3,17 @@
 
 > web audiograph builder
 
+## Usage
+
+```js
+var AudioGraph = require('web-audio-graph')
+var graph = new AudioGraph()
+
+var source = graph.addSource('oscillator')
+var filter = source.addNode('filter')
+var gain = filter.addNode('gain')
+
+source.play()
+```
 ## License
 [MIT](/license)
