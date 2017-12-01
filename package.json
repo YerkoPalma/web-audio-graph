@@ -8,7 +8,7 @@
     "index.js"
   ],
   "scripts": {
-    "test": "standard --verbose | snazzy && tape test.js | tap-summary",
+    "test": "standard --verbose | snazzy",
     "start": "node index.js"
   },
   "repository": "YerkoPalma/web-audio-graph",
@@ -22,8 +22,6 @@
   ],
   "devDependencies": {
     "snazzy": "^7.0.0",
-    "standard": "^10.0.3",
-    "tap-summary": "^4.0.0",
-    "tape": "^4.8.0"
+    "standard": "^10.0.3"
   }
 }
