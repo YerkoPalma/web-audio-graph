@@ -28,6 +28,12 @@ AudioGraph.prototype.stop = function () {
   })
 }
 
+AudioGraph.prototype.pause = function () {
+  this.sources.forEach(source => {
+    source.pause()
+  })
+}
+
 function NodeWrapper (context, type) {
   if (!(this instanceof NodeWrapper)) return new NodeWrapper(context, type)
 
@@ -66,14 +72,15 @@ function NodeWrapper (context, type) {
 
 NodeWrapper.prototype.addNode = function (nodeType) {
   var newNode = new NodeWrapper(this.context, nodeType)
-  this.instance.connect(newNode.instance)
+  if (this.instance) this.instance.connect(newNode.instance)
   this.outputs.add(newNode)
   newNode.inputs.add(this)
   return newNode
 }
 
 NodeWrapper.prototype.connectToDestination = function () {
-  this.instance.connect(this.context.destination)
+  if (this.instance) this.instance.connect(this.context.destination)
+  this.outputs.add(this.context.destination)
 }
 
 NodeWrapper.prototype.update = function (config) {
@@ -128,33 +135,56 @@ NodeWrapper.prototype.update = function (config) {
 function SourceWrapper (context, type, value) {
   assert.ok(['buffer', 'constant', 'oscillator', 'mediaElement', 'mediaStream'].indexOf(type) > -1)
 
-  // NodeWrapper.call(this)
   this.context = context
   this.outputs = new Set()
-  this.inputs = new Set()
   this.type = type
-
-  if (type === 'buffer') {
-    this.instance = this.context.createBufferSource()
-    this.instance.buffer = value
-  } else if (type === 'constant') {
-    this.instance = this.context.createConstantSource()
-  } else if (type === 'oscillator') {
-    this.instance = this.context.createOscillator()
-  } else if (type === 'mediaElement') {
-    this.instance = this.context.createMediaElementSource(value)
-  } else if (type === 'mediaStream') {
-    this.instance = this.context.createMediaStreamSource(value)
-  }
+  this._value = value
+  this.isPlaying = false
+  this._pausedAt = 0
 }
 SourceWrapper.prototype = Object.create(NodeWrapper.prototype)
 
 SourceWrapper.prototype.play = function (time) {
-  this.instance.start(time || 0)
+  if (!this.isPlaying) {
+    if (this.type === 'buffer') {
+      this.instance = this.context.createBufferSource()
+      this.instance.buffer = this._value
+    } else if (this.type === 'constant') {
+      this.instance = this.context.createConstantSource()
+    } else if (this.type === 'oscillator') {
+      this.instance = this.context.createOscillator()
+    } else if (this.type === 'mediaElement') {
+      this.instance = this.context.createMediaElementSource(this._value)
+    } else if (this.type === 'mediaStream') {
+      this.instance = this.context.createMediaStreamSource(this._value)
+    }
+
+    // restore connections
+    this.outputs.forEach(output => {
+      this.instance.connect(output.instance)
+    })
+
+    this.instance.start(this._pausedAt || time)
+    this.isPlaying = true
+  }
 }
+
 SourceWrapper.prototype.stop = function () {
-  this.instance.stop()
+  if (this.isPlaying) {
+    this.instance.stop()
+    this.isPlaying = false
+    this._pausedAt = 0
+  }
 }
+
+SourceWrapper.prototype.pause = function () {
+  if (this.isPlaying) {
+    this.instance.stop()
+    this.isPlaying = false
+    this._pausedAt = this.context.currentTime
+  }
+}
+
 SourceWrapper.prototype.update = function (config) {
   if (this.type === 'buffer') {
     if (config.buffer) this.instance.buffer = config.buffer

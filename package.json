@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "standard --verbose | snazzy",
-    "start": "budo -p 8080 -H 0.0.0.0 -l -o -d example/ example/index.js"
+    "start": "budo -p 8080 -H 0.0.0.0 -d example/ example/index.js"
   },
   "repository": "YerkoPalma/web-audio-graph",
   "license": "MIT",

@@ -1,6 +1,7 @@
 /* global fetch requestAnimationFrame */
 var AudioGraph = require('..')
 var graph = new AudioGraph()
+window.graph = graph
 
 /* Canvas stuff */
 var canvas = document.createElement('canvas')
