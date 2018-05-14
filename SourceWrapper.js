@@ -1,4 +1,3 @@
-const assert = require('nanoassert')
 const NodeWrapper = require('./NodeWrapper')
 
 module.exports = class SourceWrapper extends NodeWrapper {
@@ -10,7 +9,7 @@ module.exports = class SourceWrapper extends NodeWrapper {
     this.isPlaying = false
     this._pausedAt = 0
   }
-  
+
   play (time) {
     if (!this.isPlaying) {
       if (this.type === 'buffer') {
@@ -25,17 +24,17 @@ module.exports = class SourceWrapper extends NodeWrapper {
       } else if (this.type === 'mediaStream') {
         this.instance = this.context.createMediaStreamSource(this._value)
       }
-  
+
       // restore connections
       this.outputs.forEach(output => {
         this.instance.connect(output.instance)
       })
-  
+
       this.instance.start(this._pausedAt || time)
       this.isPlaying = true
     }
   }
-  
+
   stop () {
     if (this.isPlaying) {
       this.instance.stop()
@@ -43,7 +42,7 @@ module.exports = class SourceWrapper extends NodeWrapper {
       this._pausedAt = 0
     }
   }
-  
+
   pause () {
     if (this.isPlaying) {
       this.instance.stop()
@@ -51,7 +50,7 @@ module.exports = class SourceWrapper extends NodeWrapper {
       this._pausedAt = this.context.currentTime
     }
   }
-  
+
   update (config) {
     if (this.type === 'buffer') {
       if (config.buffer) this.instance.buffer = config.buffer

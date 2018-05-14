@@ -31,7 +31,7 @@ function play () {
         fftSize: 2048
       })
       analyser.connectToDestination()
-  
+
       source.play()
       bufferLength = analyser.instance.frequencyBinCount
       dataArray = new Uint8Array(bufferLength)
@@ -47,7 +47,7 @@ function play () {
         })
         console.log('compressor updated')
       }, 5000)
-  
+
       setTimeout(() => {
         var shaper = source.addNode('waveShaper')
         shaper.connectToDestination()
@@ -56,8 +56,6 @@ function play () {
     })
   })
 }
-
-
 
 function draw () {
   requestAnimationFrame(draw)

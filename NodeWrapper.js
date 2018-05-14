@@ -1,13 +1,13 @@
 const assert = require('nanoassert')
 module.exports = class NodeWrapper {
   constructor (context, type) {
-    assert.ok(['analyser', 'filter', 'channelMerger', 'channelSplitter', 'convolver', 'delay', 'compressor', 'gain', 'iirfilter', 'panner', 'stereoPanner', 'waveShaper', 'buffer', 'constant', 'oscillator', 'mediaElement', 'mediaStream'].indexOf(type) > -1)  
-    
+    assert.ok(['analyser', 'filter', 'channelMerger', 'channelSplitter', 'convolver', 'delay', 'compressor', 'gain', 'iirfilter', 'panner', 'stereoPanner', 'waveShaper', 'buffer', 'constant', 'oscillator', 'mediaElement', 'mediaStream'].indexOf(type) > -1)
+
     this.context = context
     this.outputs = new Set()
     this.inputs = new Set()
     this.type = type
-  
+
     if (type === 'analyser') {
       this.instance = this.context.createAnalyser()
     } else if (type === 'filter') {
@@ -34,7 +34,7 @@ module.exports = class NodeWrapper {
       this.instance = this.context.createWaveShaper()
     }
   }
-  
+
   addNode (type) {
     var newNode = new NodeWrapper(this.context, type)
     if (this.instance) this.instance.connect(newNode.instance)
@@ -42,7 +42,7 @@ module.exports = class NodeWrapper {
     newNode.inputs.add(this)
     return newNode
   }
-  
+
   connectToDestination () {
     if (this.instance) this.instance.connect(this.context.destination)
     this.outputs.add(this.context.destination)
