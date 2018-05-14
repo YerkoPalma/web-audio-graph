@@ -1,7 +1,9 @@
 /* global fetch requestAnimationFrame */
-var AudioGraph = require('..')
-var graph = new AudioGraph()
-window.graph = graph
+
+/* button stuff */
+var button = document.createElement('button')
+button.textContent = 'click me!'
+button.onclick = play
 
 /* Canvas stuff */
 var canvas = document.createElement('canvas')
@@ -11,43 +13,51 @@ var canvasCtx = canvas.getContext('2d')
 var analyser
 var dataArray
 var bufferLength
+
+document.body.appendChild(button)
 document.body.appendChild(canvas)
 
-fetch('music.mp3')
-.then(response => response.arrayBuffer())
-.then(buffer => {
-  graph.context.decodeAudioData(buffer, audioBuffer => {
-    var source = graph.addSource('buffer', audioBuffer)
-    var compresor = source.addNode('compressor')
-    analyser = compresor.addNode('analyser')
-    analyser.update({
-      fftSize: 2048
-    })
-    analyser.connectToDestination()
-
-    source.play()
-    bufferLength = analyser.instance.frequencyBinCount
-    dataArray = new Uint8Array(bufferLength)
-    analyser.instance.getByteFrequencyData(dataArray)
-    draw()
-    setTimeout(() => {
-      compresor.update({
-        threshold: -60,
-        knee: 30,
-        ratio: 12,
-        attack: 0.003,
-        release: 0.25
+function play () {
+  fetch('music.mp3')
+  .then(response => response.arrayBuffer())
+  .then(buffer => {
+    var AudioGraph = require('..')
+    var graph = new AudioGraph()
+    graph.context.decodeAudioData(buffer, audioBuffer => {
+      var source = graph.addSource('buffer', audioBuffer)
+      var compresor = source.addNode('compressor')
+      analyser = compresor.addNode('analyser')
+      analyser.update({
+        fftSize: 2048
       })
-      console.log('compressor updated')
-    }, 5000)
-
-    setTimeout(() => {
-      var shaper = source.addNode('waveShaper')
-      shaper.connectToDestination()
-      console.log('shapper added')
-    }, 6000)
+      analyser.connectToDestination()
+  
+      source.play()
+      bufferLength = analyser.instance.frequencyBinCount
+      dataArray = new Uint8Array(bufferLength)
+      analyser.instance.getByteFrequencyData(dataArray)
+      draw()
+      setTimeout(() => {
+        compresor.update({
+          threshold: -60,
+          knee: 30,
+          ratio: 12,
+          attack: 0.003,
+          release: 0.25
+        })
+        console.log('compressor updated')
+      }, 5000)
+  
+      setTimeout(() => {
+        var shaper = source.addNode('waveShaper')
+        shaper.connectToDestination()
+        console.log('shapper added')
+      }, 6000)
+    })
   })
-})
+}
+
+
 
 function draw () {
   requestAnimationFrame(draw)
