@@ -1,7 +1,8 @@
+/* global AudioWorkletNode */
 const assert = require('nanoassert')
 module.exports = class NodeWrapper {
   constructor (context, type) {
-    assert.ok(['analyser', 'filter', 'channelMerger', 'channelSplitter', 'convolver', 'delay', 'compressor', 'gain', 'iirfilter', 'panner', 'stereoPanner', 'waveShaper', 'buffer', 'constant', 'oscillator', 'mediaElement', 'mediaStream'].indexOf(type) > -1)
+    assert.ok(['analyser', 'filter', 'channelMerger', 'channelSplitter', 'convolver', 'delay', 'compressor', 'gain', 'iirfilter', 'panner', 'stereoPanner', 'waveShaper', 'buffer', 'constant', 'oscillator', 'mediaElement', 'mediaStream', 'worklet'].indexOf(type) > -1)
 
     this.context = context
     this.outputs = new Set()
@@ -41,6 +42,21 @@ module.exports = class NodeWrapper {
     this.outputs.add(newNode)
     newNode.inputs.add(this)
     return newNode
+  }
+
+  addWorkletNode (script, processor) {
+    var self = this
+    return self.context.audioWorklet.addModule(script)
+      .then(() => {
+        var worklet = new AudioWorkletNode(self.context, processor)
+        var workletWrapper = new NodeWrapper('worklet')
+        workletWrapper.instance = worklet
+        if (self.instance) self.instance.connect(workletWrapper.instance)
+        this.outputs.add(workletWrapper)
+        workletWrapper.inputs.add(this)
+
+        return new Promise((resolve, reject) => resolve(workletWrapper))
+      })
   }
 
   connectToDestination () {

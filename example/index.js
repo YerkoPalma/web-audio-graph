@@ -5,6 +5,10 @@ var button = document.createElement('button')
 button.textContent = 'click me!'
 button.onclick = play
 
+var workletButton = document.createElement('button')
+workletButton.textContent = 'click me! (worklet)'
+workletButton.onclick = playWorklet
+
 /* Canvas stuff */
 var canvas = document.createElement('canvas')
 canvas.width = 1224
@@ -15,7 +19,17 @@ var dataArray
 var bufferLength
 
 document.body.appendChild(button)
+document.body.appendChild(workletButton)
 document.body.appendChild(canvas)
+
+function playWorklet () {
+  var AudioGraph = require('..')
+  var graph = new AudioGraph()
+  var source = graph.addSource('oscillator')
+  source.addWorkletNode('gain-processor.js', 'gain-processor').then(worklet => {
+    source.play()
+  })
+}
 
 function play () {
   fetch('music.mp3')
