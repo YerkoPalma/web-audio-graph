@@ -101,6 +101,21 @@ source node can only be added to the graph itself. The availaible types are
 `panner` (to add [PannerNode][PannerNode]), `stereoPanner` (to add 
 [StereoPannerNode][StereoPannerNode]) and `waveShaper` (to add [WaveShaperNode][WaveShaperNode]).
 
+### var newWorletNode = node.addWorkletNode(script, processor)
+Add a AudioWorkletNode. Similar to the normal addNode method, but returns a 
+Promise that resolves to the newly added AudioWorkletNode. You need to pass
+the processor script file name as the first argument and the processor name 
+as the second argument.
+
+```js
+node.addWorkletNode('gain-processor.js', 'gain-processor')
+  .then(gainWorklet => {
+    gainWorklet.connectToDestination()
+    // or keep adding (worklet)nodes
+    source.play()
+  })
+```
+
 ### node.connectToDestination()
 Connect a node to the `context.destination` fo the graph.
 
