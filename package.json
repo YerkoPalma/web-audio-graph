@@ -5,7 +5,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "NodeWrapper.js",
+    "SourceWrapper.js"
   ],
   "scripts": {
     "test": "standard --verbose | snazzy",
