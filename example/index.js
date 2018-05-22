@@ -26,7 +26,8 @@ function playWorklet () {
   var AudioGraph = require('..')
   var graph = new AudioGraph()
   var source = graph.addSource('oscillator')
-  source.addWorkletNode('gain-processor.js', 'gain-processor').then(worklet => {
+  source.addWorkletNode('noise-generator.js', 'noise-generator').then(worklet => {
+    worklet.connectToDestination()
     source.play()
   })
 }

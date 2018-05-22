@@ -49,7 +49,7 @@ module.exports = class NodeWrapper {
     return self.context.audioWorklet.addModule(script)
       .then(() => {
         var worklet = new AudioWorkletNode(self.context, processor)
-        var workletWrapper = new NodeWrapper('worklet')
+        var workletWrapper = new NodeWrapper(self.context, 'worklet')
         workletWrapper.instance = worklet
         if (self.instance) self.instance.connect(workletWrapper.instance)
         this.outputs.add(workletWrapper)
