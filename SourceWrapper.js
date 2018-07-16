@@ -8,22 +8,27 @@ module.exports = class SourceWrapper extends NodeWrapper {
     this._value = value
     this.isPlaying = false
     this._pausedAt = 0
+
+    if (this.type === 'buffer') {
+      this.instance = this.context.createBufferSource()
+      this.instance.buffer = this._value
+    } else if (this.type === 'constant') {
+      this.instance = this.context.createConstantSource()
+    } else if (this.type === 'oscillator') {
+      this.instance = this.context.createOscillator()
+    } else if (this.type === 'mediaElement') {
+      this.instance = this.context.createMediaElementSource(this._value)
+    } else if (this.type === 'mediaStream') {
+      this.instance = this.context.createMediaStreamSource(this._value)
+    }
   }
 
   play (time) {
     if (!this.isPlaying) {
-      if (this.type === 'buffer') {
-        this.instance = this.context.createBufferSource()
-        this.instance.buffer = this._value
-      } else if (this.type === 'constant') {
-        this.instance = this.context.createConstantSource()
-      } else if (this.type === 'oscillator') {
-        this.instance = this.context.createOscillator()
-      } else if (this.type === 'mediaElement') {
-        this.instance = this.context.createMediaElementSource(this._value)
-      } else if (this.type === 'mediaStream') {
-        this.instance = this.context.createMediaStreamSource(this._value)
-      }
+      // restore connections
+      this.outputs.forEach(output => {
+        if (output.instance) this.instance.connect(output.instance)
+      })
 
       this.instance.start(this._pausedAt || time)
       this.isPlaying = true

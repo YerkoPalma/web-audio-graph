@@ -40,34 +40,11 @@ function play () {
     var graph = new AudioGraph()
     graph.context.decodeAudioData(buffer, audioBuffer => {
       var source = graph.addSource('buffer', audioBuffer)
-      var compresor = source.addNode('compressor')
-      analyser = compresor.addNode('analyser')
-      analyser.update({
-        fftSize: 2048
-      })
-      analyser.connectToDestination()
+      
+      source.connectToDestination()
 
       source.play()
-      bufferLength = analyser.instance.frequencyBinCount
-      dataArray = new Uint8Array(bufferLength)
-      analyser.instance.getByteFrequencyData(dataArray)
-      draw()
-      setTimeout(() => {
-        compresor.update({
-          threshold: -60,
-          knee: 30,
-          ratio: 12,
-          attack: 0.003,
-          release: 0.25
-        })
-        console.log('compressor updated')
-      }, 5000)
-
-      setTimeout(() => {
-        var shaper = source.addNode('waveShaper')
-        shaper.connectToDestination()
-        console.log('shapper added')
-      }, 6000)
+      
     })
   })
 }
