@@ -25,11 +25,6 @@ module.exports = class SourceWrapper extends NodeWrapper {
         this.instance = this.context.createMediaStreamSource(this._value)
       }
 
-      // restore connections
-      this.outputs.forEach(output => {
-        this.instance.connect(output.instance)
-      })
-
       this.instance.start(this._pausedAt || time)
       this.isPlaying = true
     }

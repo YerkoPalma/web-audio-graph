@@ -1,3 +1,4 @@
+/* global AudioWorkletProcessor registerProcessor */
 // Copyright (c) 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -10,22 +11,22 @@
  */
 class NoiseGenerator extends AudioWorkletProcessor {
   static get parameterDescriptors () {
-    return [{ name: 'amplitude', defaultValue: 0.25, minValue: 0, maxValue: 1 }];
+    return [{ name: 'amplitude', defaultValue: 0.25, minValue: 0, maxValue: 1 }]
   }
 
   process (inputs, outputs, parameters) {
-    const output = outputs[0];
-    const amplitude = parameters.amplitude;
+    const output = outputs[0]
+    const amplitude = parameters.amplitude
     // console.log(amplitude);
     for (let channel = 0; channel < output.length; ++channel) {
-      const outputChannel = output[channel];
+      const outputChannel = output[channel]
       for (let i = 0; i < outputChannel.length; ++i) {
-        outputChannel[i] = 2 * (Math.random() - 0.5) * amplitude[i];
+        outputChannel[i] = 2 * (Math.random() - 0.5) * amplitude[i]
       }
     }
 
-    return true;
+    return true
   }
 }
 
-registerProcessor('noise-generator', NoiseGenerator);
+registerProcessor('noise-generator', NoiseGenerator)
